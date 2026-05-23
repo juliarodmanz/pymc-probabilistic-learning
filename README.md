@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## Probabilistic ML Lab (PyMC)
 Experimentos de modelado probabilístico y redes neuronales bayesianas con PyMC. Incluye los siguientes casos de estudio: 
 
