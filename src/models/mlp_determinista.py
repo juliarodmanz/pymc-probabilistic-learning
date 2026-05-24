@@ -3,6 +3,10 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 class BaselineNN(nn.Module):
+    """
+    Construcción y entrenamiento de una Red Neuronal Determinista usando PyTorch.
+    La arquitectura consiste en dos capas ocultas de 50 neuronas cada una con función de activación ReLU, seguida de una capa de salida para regresión.
+    """
     def __init__(self, input_dim, hidden_dim=50, output_dim=1):
         #Inicialización de la red neuronal
         super(BaselineNN, self).__init__()
@@ -21,6 +25,10 @@ class BaselineNN(nn.Module):
         return out
 
 def train_model(model, X_train, y_train, num_epochs=1000, learning_rate=0.001):
+    """
+    Función de entrenamiento para la Red Neuronal Determinista.
+    Utiliza el error cuadrático medio como función de pérdida y el optimizador Adam para actualizar los pesos de la red neuronal.
+    """
     #Función de pérdida y optimizador
     criterion = nn.MSELoss() #Función de pérdida usando error cuadrático medio
     optimizer = optim.Adam(model.parameters(), lr=learning_rate) #Optimizador Adam: actualiza los pesos de la red neuronal
@@ -42,6 +50,10 @@ def train_model(model, X_train, y_train, num_epochs=1000, learning_rate=0.001):
             print(f'Época [{epoch+1}/{num_epochs}], Pérdida(Error Medio Cuadrático): {loss.item():.4f}')
     return model
 def predict_model(model, X_test):
+    """
+    Función de predicción para la Red Neuronal Determinista.
+    Genera predicciones puntuales para un nuevo conjunto de datos de prueba.
+    """
     # Generar predicciones puntuales para un nuevo conjunto de datos de prueba
     model.eval() #Modo de evaluación, desactiva el dropout y la normalización por lotes
     with torch.no_grad(): #Desactiva el cálculo de gradientes
