@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 class BaselineNN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim):
+    def __init__(self, input_dim, hidden_dim=50, output_dim=1):
         #Inicialización de la red neuronal
         super(BaselineNN, self).__init__()
         #Definición de las capas de la red neuronal
@@ -14,9 +14,9 @@ class BaselineNN(nn.Module):
     def forward(self, x):
         #Propagación hacia adelante
         out = self.fc1(x) #Capa oculta
-        out = self.relu1(out) #Función de activación ReLU
+        out = self.relu(out) #Función de activación ReLU
         out = self.fc2(out) #Capa de salida
-        out = self.relu2(out) #Función de activación ReLU
+        out = self.relu(out) #Función de activación ReLU
         out = self.fc3(out) #Capa de salida
         return out
 
