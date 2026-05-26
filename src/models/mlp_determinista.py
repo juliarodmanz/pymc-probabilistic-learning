@@ -12,14 +12,15 @@ class BaselineNN(nn.Module):
         super(BaselineNN, self).__init__()
         #Definición de las capas de la red neuronal
         self.fc1 = nn.Linear(input_dim, hidden_dim) #Capa oculta
+        self.fc2 = nn.Linear(hidden_dim, hidden_dim) #Capa oculta
         self.relu = nn.ReLU() #Función de activación ReLU
-        self.fc2 = nn.Linear(hidden_dim, output_dim) #Capa de salida
+        self.fc3 = nn.Linear(hidden_dim, output_dim) #Capa de salida
 
     def forward(self, x):
         #Propagación hacia adelante
         out = self.fc1(x) #Capa oculta
         out = self.relu(out) #Función de activación ReLU
-        out = self.fc2(out) #Capa de salida
+        out = self.fc2(out) #Capa oculta
         out = self.relu(out) #Función de activación ReLU
         out = self.fc3(out) #Capa de salida
         return out
