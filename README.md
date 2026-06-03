@@ -9,16 +9,12 @@ PONER
 Estructura del repositorio
 * src/
     * data/: generación de datasets sintéticos.
-    * models/: BNN en PyMC y baseline determinista.
-    * xperiments/: scripts de entrenamiento y evaluación.
+    * models/: BNN en PyMC y baseline determinista con PyTorch.
+    * experiments/: scripts de entrenamiento y evaluación.
     * viz/: funciones de visualización.
-    * utils/: semillas y métricas.
-* data/
-    * raw/, processed/
+    * utils/: semillas y métricas./
 * reports/
     * figures/ (salida de gráficos), resultados.md, modelos guardados.
-* notebooks/
-    * cuadernos de exploración.
 * scripts/
     * setup_env.sh, run_all.sh.
 * requirements.txt, LICENSE, README.md
@@ -37,33 +33,31 @@ Crear y activar entorno virtual
 * Instalar dependencias
     pip install --upgrade pip
     pip install -r requirements.txt
-* Reproducir el experimento
-* Generar datos sintéticos
-    python src/data/make_dataset.py
 * Entrenar modelos
-    python src/experiments/run_training.py
-* Guarda: reports/bnn_idata.nc y reports/models/mlp.joblib
-* Evaluar y generar salidas
-    python src/experiments/run_evaluation.py
-* Métricas y resumen en reports/resultados.md
+    python src/experiments/train_robot.py
+    python src/experiments/train_biometrics.py
 * Figuras en reports/figures/ (si las activas desde src/viz/plots.py)
 * Descripción técnica (resumen)
-    * BNN: arquitectura 1-50-50-1 con activaciones ReLU implementada en PyMC.
-    * Priors: pesos y sesgos ~ N(0, 1).
-    * Verosimilitud: y ~ N(f_θ(x), σ_obs), con σ_obs ~ HalfNormal.
-    * Inferencia: ADVI (Inferencia Variacional Automática) o MCMC (NUTS).
-    * Incertidumbre: 
-    * Total: Var[y*|x*,D] estimada por muestras de la posterior.
-    * Aleatoria: E[σ_obs^2] (homoscedástica en este caso base).
-    * Epistémica: Var_total - E[σ_obs^2].
-    * Baseline: Perceptrón Multicapa en PyTorch (50, 50), activación ReLU, optimización MSE (Adam).
+    * Experimento 1: Cinemática del Robot (Regresión y Vacío Epistémico)
+        * Preprocesamiento: Normalización Z-score aplicada exclusivamente a las entradas y salidas del modelo bayesiano para garantizar la convergencia del integrador numérico
+        * BNN: arquitectura 1-50-50-1 con activaciones ReLU implementada en PyMC.
+        * Priors: pesos y sesgos ~ N(0, 1).
+        * Verosimilitud: y ~ N(f_θ(x), σ_obs), con σ_obs ~ HalfNormal.
+        * Inferencia: ADVI (Inferencia Variacional Automática) o MCMC (NUTS).
+        * Incertidumbre: 
+            * Total: Var[y*|x*,D] estimada por muestras de la posterior.
+            * Aleatoria: E[σ_obs^2] (homoscedástica en este caso base).
+            * Epistémica: Var_total - E[σ_obs^2].
+        * Baseline: Perceptrón Multicapa en PyTorch (50, 50), activación ReLU, optimización MSE (Adam).
 
-* Resultados esperados
-    * In-distribution (ID): RMSE bajo en ambos modelos, incertidumbre moderada.
-    * Out-of-distribution (OOD) y fallos de sensor:
-        * BNN incrementa la varianza epistémica drásticamente, señalando baja fiabilidad en la zona ciega.
-        * Red clásica produce una predicción puntual sobreconfiada sin indicador de error.
-
+    * Experimento 2: Seguridad Biométrica (Clasificación y Detección OOD)
+        * Transformación Geométrica: Expansión polinómica de la entrada original para garantizar la generación de fronteras de decisión cerradas.
+        * BNN: Arquitectura 4-20-3 con activación oculta ReLU y salida categórica Softmax, implementada en PyMC.
+        * Priors:  Pesos de la capa oculta siguen una normal centrada en el origen con varianza  σ^2= 2/4, pesos de salida siguen una normal centrada en el origen con  σ^2= 1/20, y sesgos siguen una normal centrada en el origen con varianza 1.
+        * Verosimilitud: Distribución Categórica
+        * Inferencia: ADVI (Inferencia Variacional Automática) o MCMC (NUTS).
+        * Incertidumbre: Cuantificada mediante la Entropía Predictiva de Shannon
+        * Baseline: rceptrón Multicapa estocástico en PyTorch (4-32-3). Optimizado minimizando la Entropía Cruzada mediante Adam con regularización L2. Utiliza MCDropout mantenido activo durante la inferencia como mecanismo para estimar la incertidumbre.
 * Cómo adaptar/expandir
     * Heteroscedasticidad: modelar σ_obs(x) con una segunda "cabeza" de salida.
     * Más capas/ancho: editar los parámetros en `src/models/mlp_determinista.py` y `src/models/modelon_bayesiano.py`.

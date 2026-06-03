@@ -40,3 +40,18 @@ def calculate_mean_predictive_variance(y_pred_std):
     pues dependen de los valores reales y de las predicciones puntuales.
     """
     return np.mean(y_pred_std**2) #Devuelve la varianza predictiva media, que es una medida de la incertidumbre promedio en las predicciones del modelo. Un valor alto puede indicar que el modelo tiene dificultades para hacer predicciones precisas en ciertas áreas del espacio de entrada, lo que podría ser un indicio de zonas ciegas o falta de datos representativos en esas regiones.
+
+
+def calculate_predictive_entropy(predicted_probs):
+    """
+    Calcula la Entropía de Shannon predictiva para cuantificar la incertidumbre epistémica
+    en problemas de clasificación.
+    predicted_probs: array de probabilidades con forma (n_muestras, n_clases)
+    """
+    # Evitamos log(0) sumando un epsilon muy pequeño
+    epsilon = 1e-12
+    probs_safe = np.clip(predicted_probs, epsilon, 1. - epsilon)
+    
+    # Fórmula de la entropía: H = - sum(p * log(p))
+    entropy = -np.sum(probs_safe * np.log(probs_safe), axis=1)
+    return entropy

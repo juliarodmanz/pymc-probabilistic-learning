@@ -31,7 +31,7 @@ def train_model(model, X_train, y_train, num_epochs=1000, learning_rate=0.001):
     Utiliza el error cuadrático medio como función de pérdida y el optimizador Adam para actualizar los pesos de la red neuronal.
     """
     #Función de pérdida y optimizador
-    criterion = nn.MSELoss() #Función de pérdida usando error cuadrático medio
+    loss_function = nn.MSELoss() #Función de pérdida usando error cuadrático medio
     optimizer = optim.Adam(model.parameters(), lr=learning_rate) #Optimizador Adam: actualiza los pesos de la red neuronal
     
     X_train = torch.tensor(X_train, dtype=torch.float32) #Convertir datos de entrenamiento a tensor
@@ -42,8 +42,8 @@ def train_model(model, X_train, y_train, num_epochs=1000, learning_rate=0.001):
 
         model.train() #Modo entrenamiento
         predictions = model(X_train) #Predicciones del modelo
-        loss = criterion(predictions, y_train) #Cálculo de la pérdida
-        optimizer.zero_grad() #Reiniciar los gradientes
+        loss = loss_function(predictions, y_train) #Cálculo de la pérdida
+        optimizer.zero_grad() #Reiniciar los gradientes para evitar acumulación
         loss.backward() #Retropagación hacia atrás
         optimizer.step() #Actualización de los pesos por descenso de gradiente
 
